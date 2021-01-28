@@ -10,6 +10,7 @@
     "test:dev": "jest test --watch",
     "test:verbose": "DEBUG=starling* npm test",
     "typecheck": "tsc --noEmit",
+    "typecheck:strict": "tsc --noEmit -p ./tsconfig.typecheck.json",
     "lint": "eslint src test",
     "lint:fix": "eslint --fix src test",
     "jsdoc": "node_modules/.bin/jsdoc -c .jsdoc.json --verbose"
