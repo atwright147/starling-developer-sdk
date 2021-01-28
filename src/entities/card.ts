@@ -1,14 +1,24 @@
-import axios from 'axios'
+import axios, { AxiosPromise } from 'axios'
 import debug from 'debug'
 import { defaultHeaders, payloadHeaders } from '../utils/http'
 import { struct, minAPIParameterDefintion, minAPIParameterValidator } from '../utils/validator'
+
+export interface IUpdateCardControlParameters {
+  apiUrl: string;
+  accessToken: string;
+  cardUid: string;
+  enabled: boolean;
+  endpoint: string;
+}
 
 const log = debug('starling:card-service')
 
 /**
  * Service to interact with a customer card
  */
-class Card {
+export class Card {
+  options
+
   /**
    * Creates an instance of the client's card
    * @param {Object} options - configuration parameters
@@ -131,7 +141,7 @@ class Card {
    * @param {string} parameters.endpoint - the last segment of the endpoint name
    * @return {Promise} - the http request promise
    */
-  updateCardControl (parameters) {
+  updateCardControl (parameters: IUpdateCardControlParameters): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     updateCardControlParameterValidator(parameters)
     const { apiUrl, accessToken, cardUid, enabled, endpoint } = parameters
@@ -153,5 +163,3 @@ const updateCardControlParameterValidator = struct.interface({
   cardUid: 'uuid',
   enabled: 'boolean'
 })
-
-module.exports = Card

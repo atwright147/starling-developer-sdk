@@ -1,4 +1,12 @@
-const superstruct = require('superstruct').superstruct
+import { superstruct } from 'superstruct'
+
+export interface IApiParameters {
+  uuid: string;
+  yearMonth: string;
+  date: string;
+  timestamp: string;
+}
+
 export const struct = superstruct({
   types: {
     uuid: value => /^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value),
