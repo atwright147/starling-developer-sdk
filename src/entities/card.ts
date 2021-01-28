@@ -1,13 +1,18 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import axios, { AxiosPromise } from 'axios'
 import debug from 'debug'
 import { defaultHeaders, payloadHeaders } from '../utils/http'
 import { struct, minAPIParameterDefintion, minAPIParameterValidator } from '../utils/validator'
 
-export interface IUpdateCardControlParameters {
+export interface IParameters {
   apiUrl: string;
   accessToken: string;
   cardUid: string;
   enabled: boolean;
+}
+
+export interface IParametersWithEndpoint extends IParameters {
   endpoint: string;
 }
 
@@ -23,7 +28,7 @@ export class Card {
    * Creates an instance of the client's card
    * @param {Object} options - configuration parameters
    */
-  constructor (options) {
+  constructor (options: IParameters) {
     this.options = options
   }
 
@@ -33,7 +38,7 @@ export class Card {
    * @param {string} parameters.accessToken - the oauth bearer token
    * @return {Promise} - the http request promise
    */
-  getCards (parameters) {
+  getCards (parameters: Pick<IParameters, 'apiUrl' | 'accessToken'>): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     minAPIParameterValidator(parameters)
     const { apiUrl, accessToken } = parameters
@@ -56,7 +61,7 @@ export class Card {
    * @param {boolean} parameters.enabled - Whether the card should be locked. Set to false to lock, true to unlock.
    * @return {Promise} - the http request promise
    */
-  updateCardLock (parameters) {
+  updateCardLock (parameters: IParameters): AxiosPromise<any> {
     return this.updateCardControl({ ...parameters, endpoint: 'enabled' })
   }
 
@@ -68,7 +73,7 @@ export class Card {
    * @param {boolean} parameters.enabled - Whether ATM withdrawals should be allowed. Set to false to block, true to allow.
    * @return {Promise} - the http request promise
    */
-  updateCardATMControl (parameters) {
+  updateCardATMControl (parameters: IParameters): AxiosPromise<any> {
     return this.updateCardControl({ ...parameters, endpoint: 'atm-enabled' })
   }
 
@@ -80,7 +85,7 @@ export class Card {
    * @param {boolean} parameters.enabled - Whether online payments should be allowed. Set to false to block, true to allow.
    * @return {Promise} - the http request promise
    */
-  updateCardOnlineControl (parameters) {
+  updateCardOnlineControl (parameters: IParameters): AxiosPromise<any> {
     return this.updateCardControl({ ...parameters, endpoint: 'online-enabled' })
   }
 
@@ -92,7 +97,7 @@ export class Card {
    * @param {boolean} parameters.enabled - Whether mobile wallet payments should be allowed. Set to false to block, true to allow.
    * @return {Promise} - the http request promise
    */
-  updateCardMobileWalletControl (parameters) {
+  updateCardMobileWalletControl (parameters: IParameters): AxiosPromise<any> {
     return this.updateCardControl({ ...parameters, endpoint: 'mobile-wallet-enabled' })
   }
 
@@ -104,7 +109,7 @@ export class Card {
    * @param {boolean} parameters.enabled - Whether gambling payments should be allowed. Set to false to block, true to allow.
    * @return {Promise} - the http request promise
    */
-  updateCardGamblingControl (parameters) {
+  updateCardGamblingControl (parameters: IParameters): AxiosPromise<any> {
     return this.updateCardControl({ ...parameters, endpoint: 'gambling-enabled' })
   }
 
@@ -116,7 +121,7 @@ export class Card {
    * @param {boolean} parameters.enabled - Whether card present payments (contactless and chip and pin) should be allowed. Set to false to block, true to allow.
    * @return {Promise} - the http request promise
    */
-  updateCardPresentControl (parameters) {
+  updateCardPresentControl (parameters: IParameters): AxiosPromise<any> {
     return this.updateCardControl({ ...parameters, endpoint: 'pos-enabled' })
   }
 
@@ -128,7 +133,7 @@ export class Card {
    * @param {boolean} parameters.enabled - Whether magstripe payments should be allowed. Set to false to block, true to allow.
    * @return {Promise} - the http request promise
    */
-  updateCardMagstripeControl (parameters) {
+  updateCardMagstripeControl (parameters: IParameters): AxiosPromise<any> {
     return this.updateCardControl({ ...parameters, endpoint: 'mag-stripe-enabled' })
   }
 
@@ -141,7 +146,7 @@ export class Card {
    * @param {string} parameters.endpoint - the last segment of the endpoint name
    * @return {Promise} - the http request promise
    */
-  updateCardControl (parameters: IUpdateCardControlParameters): AxiosPromise<any> {
+  updateCardControl (parameters: IParametersWithEndpoint): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     updateCardControlParameterValidator(parameters)
     const { apiUrl, accessToken, cardUid, enabled, endpoint } = parameters
