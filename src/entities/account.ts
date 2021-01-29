@@ -1,19 +1,35 @@
-import axios from 'axios'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import axios, { AxiosPromise } from 'axios'
 import debug from 'debug'
 import { defaultHeaders } from '../utils/http'
 import { struct, minAPIParameterDefintion, minAPIParameterValidator } from '../utils/validator'
+
+export interface IAccountParams {
+  accessToken: string;
+  accountUid: string;
+  apiUrl: string;
+  end: string;
+  format: string;
+  responseType: string;  // TODO: figure out what this should actually be
+  start: string;
+  targetAmountInMinorUnits: number;
+  yearMonth: string;
+}
 
 const log = debug('starling:account-service')
 
 /**
  * Service to interact with a customer's account
  */
-class Account {
+export class Account {
+  options: Partial<IAccountParams>
+
   /**
    * Creates an instance of the account client
    * @param {Object} options - application config
    */
-  constructor (options) {
+  constructor (options: Partial<IAccountParams>) {
     this.options = options
   }
 
@@ -23,7 +39,7 @@ class Account {
    * @param {string} parameters.accessToken - the oauth bearer token
    * @return {Promise} - the http request promise
    */
-  getAccounts (parameters) {
+  getAccounts (parameters: Pick<IAccountParams, 'apiUrl' | 'accessToken'>): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     minAPIParameterValidator(parameters)
     const { apiUrl, accessToken } = parameters
@@ -45,7 +61,7 @@ class Account {
    * @param {string} parameters.accountUid - the account uid
    * @return {Promise} - the http request promise
    */
-  getAccountIdentifiers (parameters) {
+  getAccountIdentifiers (parameters: Pick<IAccountParams, 'apiUrl' | 'accessToken' | 'accountUid'>): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     getAccountIdentifiersParameterValidator(parameters)
     const { apiUrl, accessToken, accountUid } = parameters
@@ -67,7 +83,7 @@ class Account {
    * @param {string} parameters.accountUid - the account uid
    * @return {Promise} - the http request promise
    */
-  getAccountBalance (parameters) {
+  getAccountBalance (parameters: Pick<IAccountParams, 'apiUrl' | 'accessToken' | 'accountUid'>): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     getAccountBalanceParameterValidator(parameters)
     const { apiUrl, accessToken, accountUid } = parameters
@@ -90,7 +106,7 @@ class Account {
    * @param {number} parameters.targetAmountInMinorUnits - the target amount in minor units
    * @return {Promise} - the http request promise
    */
-  getConfirmationOfFunds (parameters) {
+  getConfirmationOfFunds (parameters: Pick<IAccountParams, 'apiUrl' | 'accessToken' | 'accountUid' | 'targetAmountInMinorUnits'>): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     getConfirmationOfFundsParameterValidator(parameters)
     const { apiUrl, accessToken, accountUid, targetAmountInMinorUnits } = parameters
@@ -115,7 +131,7 @@ class Account {
    * @param {string} parameters.accountUid - the account uid
    * @return {Promise} - the http request promise
    */
-  getStatementPeriods (parameters) {
+  getStatementPeriods (parameters: Pick<IAccountParams, 'apiUrl' | 'accessToken' | 'accountUid'>): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     getStatementPeriodsParameterValidator(parameters)
     const { apiUrl, accessToken, accountUid } = parameters
@@ -140,7 +156,7 @@ class Account {
    * @param {string=} parameters.responseType - the axios responseType for the request
    * @return {Promise} - the http request promise
    */
-  getStatementForPeriod (parameters) {
+  getStatementForPeriod (parameters: Omit<IAccountParams, 'targetAmountInMinorUnits' | 'start' | 'end'>): AxiosPromise<any> {
     parameters = Object.assign({}, { yearMonth: new Date().toISOString().slice(0, 7), format: 'text/csv', responseType: 'stream' }, this.options, parameters)
     getStatementForPeriodParameterValidator(parameters)
     const { apiUrl, accessToken, accountUid, format, yearMonth, responseType } = parameters
@@ -148,6 +164,7 @@ class Account {
     const url = `${apiUrl}/api/v2/accounts/${accountUid}/statement/download`
     log(`GET ${url}`)
 
+    // @ts-ignore
     return axios({
       method: 'GET',
       url,
@@ -173,7 +190,7 @@ class Account {
    * @param {string=} parameters.responseType - the axios responseType for the request
    * @return {Promise} - the http request promise
    */
-  getStatementForRange (parameters) {
+  getStatementForRange (parameters: IAccountParams): AxiosPromise<any> {
     parameters = Object.assign({}, { format: 'text/csv', responseType: 'stream' }, this.options, parameters)
     getStatementForRangeParameterValidator(parameters)
     const { apiUrl, accessToken, accountUid, start, end, format, responseType } = parameters
@@ -181,6 +198,7 @@ class Account {
     const url = `${apiUrl}/api/v2/accounts/${accountUid}/statement/downloadForDateRange`
     log(`GET ${url}`)
 
+    // @ts-ignore
     return axios({
       method: 'GET',
       url,
@@ -221,5 +239,3 @@ const getStatementForRangeParameterValidator = struct.interface({
   format: struct.enum(['application/pdf', 'text/csv']),
   responseType: 'string'
 })
-
-module.exports = Account
