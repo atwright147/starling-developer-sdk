@@ -1,19 +1,28 @@
-import axios from 'axios'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import axios, { AxiosPromise } from 'axios'
 import debug from 'debug'
 import { defaultHeaders } from '../utils/http'
 import { minAPIParameterValidator } from '../utils/validator'
+
+export interface IIdentityParams {
+  apiUrl: string;
+  accessToken: string;
+}
 
 const log = debug('starling:identity-service')
 
 /**
  * Service to interact with the API User identities endpoints
  */
-class Identity {
+export class Identity {
+  options: Partial<IIdentityParams>
+
   /**
    * Creates an instance of the identity client
    * @param {Object} options - configuration parameters
    */
-  constructor (options) {
+  constructor (options: IIdentityParams) {
     this.options = options
   }
 
@@ -23,7 +32,7 @@ class Identity {
    * @param {string} parameters.accessToken - the oauth bearer token.
    * @return {Promise} - the http request promise
    */
-  getTokenIdentity (parameters) {
+  getTokenIdentity (parameters: IIdentityParams): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     minAPIParameterValidator(parameters)
     const { apiUrl, accessToken } = parameters
@@ -44,7 +53,7 @@ class Identity {
    * @param {string} parameters.accessToken - the oauth bearer token.
    * @return {Promise} - the http request promise
    */
-  getAuthorisingIndividual (parameters) {
+  getAuthorisingIndividual (parameters: IIdentityParams): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     minAPIParameterValidator(parameters)
     const { apiUrl, accessToken } = parameters
@@ -59,5 +68,3 @@ class Identity {
     })
   }
 }
-
-module.exports = Identity

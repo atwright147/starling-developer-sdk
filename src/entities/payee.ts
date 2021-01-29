@@ -1,19 +1,30 @@
-import axios from 'axios'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import axios, { AxiosPromise } from 'axios'
 import debug from 'debug'
 import { defaultHeaders, payloadHeaders } from '../utils/http'
 import { struct, minAPIParameterDefintion, minAPIParameterValidator } from '../utils/validator'
+
+export interface IPayeeParams {
+  apiUrl: string;
+  accessToken: string;
+  payeeCreationRequest: Record<string, unknown>;
+  payeeUid: string;
+}
 
 const log = debug('starling:payee-service')
 
 /**
  * Service to interact with an account holder's payees
  */
-class Payee {
+export class Payee {
+  options: Partial<IPayeeParams>
+
   /**
    * Create a new payee service
    * @param {Object} options - configuration parameters
    */
-  constructor (options) {
+  constructor (options: IPayeeParams) {
     this.options = options
   }
 
@@ -23,7 +34,7 @@ class Payee {
    * @param {string} parameters.accessToken - the oauth bearer token.
    * @return {Promise} - the http request promise
    */
-  getPayees (parameters) {
+  getPayees (parameters: Pick<IPayeeParams, 'apiUrl' | 'accessToken'>): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     minAPIParameterValidator(parameters)
     const { apiUrl, accessToken } = parameters
@@ -45,7 +56,7 @@ class Payee {
    * @param {Object} parameters.payeeCreationRequest - the payee creation request.
    * @return {Promise} - the http request promise
    */
-  createPayee (parameters) {
+  createPayee (parameters: Omit<IPayeeParams, 'payeeUid'>): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     createPayeeParameterValidator(parameters)
     const { apiUrl, accessToken, payeeCreationRequest } = parameters
@@ -67,7 +78,7 @@ class Payee {
    * @param {string} parameters.payeeUid - the payeeUid of the payee to be deleted.
    * @return {Promise} - the http request promise
    */
-  deletePayee (parameters) {
+  deletePayee (parameters: Omit<IPayeeParams, 'payeeCreationRequest'>): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     deletePayeeParameterValidator(parameters)
     const { apiUrl, accessToken, payeeUid } = parameters
@@ -108,5 +119,3 @@ const deletePayeeParameterValidator = struct.interface({
   ...minAPIParameterDefintion,
   payeeUid: 'uuid'
 })
-
-module.exports = Payee

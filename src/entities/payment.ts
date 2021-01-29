@@ -1,19 +1,31 @@
-import axios from 'axios'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import axios, { AxiosPromise } from 'axios'
 import debug from 'debug'
 import { defaultHeaders } from '../utils/http'
 import { struct, minAPIParameterDefintion } from '../utils/validator'
+
+export interface IPaymentParams {
+  apiUrl: string;
+  accessToken: string;
+  accountUid: string;
+  categoryUid: string;
+  paymentOrderUid: string;
+}
 
 const log = debug('starling:payment-service')
 
 /**
  * Service to interact with a customer's payments
  */
-class Payment {
+export class Payment {
+  options: Partial<IPaymentParams>
+
   /**
    * Create a new payment service
    * @param {Object} options - configuration parameters
    */
-  constructor (options) {
+  constructor (options: IPaymentParams) {
     this.options = options
   }
 
@@ -24,7 +36,7 @@ class Payment {
    * @param {string} parameters.paymentOrderUid - the payment order uid
    * @return {Promise} - the http request promise
    */
-  getPaymentOrder (parameters) {
+  getPaymentOrder (parameters: Omit<IPaymentParams, 'accountUid' | 'categoryUid'>): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     getPaymentOrderParameterValidator(parameters)
     const { apiUrl, accessToken, paymentOrderUid } = parameters
@@ -46,7 +58,7 @@ class Payment {
    * @param {string} parameters.paymentOrderUid - the payment order uid
    * @return {Promise} - the http request promise
    */
-  getPaymentOrderPayments (parameters) {
+  getPaymentOrderPayments (parameters: Omit<IPaymentParams, 'accountUid' | 'categoryUid'>): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     getPaymentOrderPaymentsParameterValidator(parameters)
     const { apiUrl, accessToken, paymentOrderUid } = parameters
@@ -69,7 +81,7 @@ class Payment {
    * @param {string} parameters.categoryUid - the category uid of the category to get standing orders of
    * @return {Promise} - the http request promise
    */
-  listStandingOrders (parameters) {
+  listStandingOrders (parameters: Omit<IPaymentParams, 'paymentOrderUid'>): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     listStandingOrdersParameterValidator(parameters)
     const { apiUrl, accessToken, accountUid, categoryUid } = parameters
@@ -93,7 +105,7 @@ class Payment {
    * @param {string} parameters.paymentOrderUid - the payment order uid of the standing order
    * @return {Promise} - the http request promise
    */
-  getStandingOrder (parameters) {
+  getStandingOrder (parameters: IPaymentParams): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     getStandingOrderParameterValidator(parameters)
     const { apiUrl, accessToken, accountUid, categoryUid, paymentOrderUid } = parameters
@@ -131,5 +143,3 @@ const getStandingOrderParameterValidator = struct.interface({
   categoryUid: 'uuid',
   paymentOrderUid: 'uuid'
 })
-
-module.exports = Payment

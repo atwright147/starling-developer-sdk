@@ -1,21 +1,42 @@
-import axios from 'axios'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import axios, { AxiosPromise } from 'axios'
 import debug from 'debug'
 import { struct } from '../utils/validator'
 
+// TODO: convert to ENUMs
 const ACCESS_TOKEN_GRANT_TYPE = 'authorization_code'
 const REFRESH_TOKEN_GRANT_TYPE = 'refresh_token'
+
+export interface IGetOAuthTokenQueryParams {
+  code?: string;
+  refresh_token?: string;
+  grant_type: string;
+  client_id: string;
+  client_secret: string;
+  redirect_uri?: string;
+}
+
+export interface IOAuthParams {
+  apiUrl: string;
+  clientId: string;
+  clientSecret: string;
+  redirectUri: string;
+}
 
 const log = debug('starling:oauth-service')
 
 /**
  * Service to interact with a the oauth endpoint
  */
-class OAuth {
+export class OAuth {
+  options: IOAuthParams  // not partial!
+
   /**
    * Create a new oauth service
    * @param {Object} options - configuration parameters
    */
-  constructor (options) {
+  constructor (options: IOAuthParams) {
     this.options = options
   }
 
@@ -24,16 +45,17 @@ class OAuth {
    * @param {string} authorizationCode - the authorization code, acquired from the user agent after the user authenticates with starling
    * @return {Promise} - the http request promise
    */
-  getAccessToken (authorizationCode) {
-    return this.getOAuthToken({
-      queryParams: {
+  getAccessToken (authorizationCode: string): AxiosPromise<any> {
+    return this.getOAuthToken(
+      this.options.apiUrl,
+      {
         code: authorizationCode,
         grant_type: ACCESS_TOKEN_GRANT_TYPE,
         client_id: this.options.clientId,
         client_secret: this.options.clientSecret,
         redirect_uri: this.options.redirectUri
       }
-    })
+    )
   }
 
   /**
@@ -41,30 +63,30 @@ class OAuth {
    * @param {string} refreshToken - the oauth refresh token, used when the access token expires to claim a new access token.
    * @return {Promise} - the http request promise
    */
-  refreshAccessToken (refreshToken) {
-    return this.getOAuthToken({
-      queryParams: {
+  refreshAccessToken (refreshToken: string): AxiosPromise<any> {
+    return this.getOAuthToken(
+      this.options.apiUrl,
+      {
         refresh_token: refreshToken,
         grant_type: REFRESH_TOKEN_GRANT_TYPE,
         client_id: this.options.clientId,
         client_secret: this.options.clientSecret
       }
-    })
+    )
   }
 
   /**
    * Gets the access token from the starling OAuth endpoint
-   * @param {string} parameters.apiUrl - the OAuth url
-   * @param {object} parameters.queryParams - the query params passed to the OAuth endpoint as per the OAuth spec
+   * @param {string} apiUrl - the OAuth url
+   * @param {object} queryParams - the query params passed to the OAuth endpoint as per the OAuth spec
    * @return {Promise} - the http request promise
    */
-  getOAuthToken (parameters) {
+  getOAuthToken (apiUrl: string, parameters: IGetOAuthTokenQueryParams): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
-    getOAuthTokenParameterValidator(parameters)
-    const { apiUrl, queryParams } = parameters
+    getOAuthTokenParameterValidator({ apiUrl, parameters })
 
     const url = `${apiUrl}/oauth/access-token`
-    log(`POST ${url} queryParams:${JSON.stringify(queryParams)}`)
+    log(`POST ${url} queryParams:${JSON.stringify(parameters)}`)
 
     return axios({
       url,
@@ -73,7 +95,7 @@ class OAuth {
         'Content-Type': 'application/x-www-form-urlencoded',
         Accept: 'application/json'
       },
-      params: queryParams
+      params: parameters
     })
   }
 }
@@ -96,5 +118,3 @@ const getOAuthTokenParameterValidator = struct.interface({
     })
   ])
 })
-
-module.exports = OAuth

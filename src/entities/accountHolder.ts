@@ -1,19 +1,28 @@
-import axios from 'axios'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import axios, { AxiosPromise } from 'axios'
 import debug from 'debug'
 import { defaultHeaders } from '../utils/http'
 import { minAPIParameterValidator } from '../utils/validator'
+
+export interface IAccountHolderParams {
+  apiUrl: string;
+  accessToken: string;
+}
 
 const log = debug('starling:account-holder-service')
 
 /**
  * Service to interact with an account holder
  */
-class AccountHolder {
+export class AccountHolder {
+  options: Partial<IAccountHolderParams>
+
   /**
    * Creates an instance of the account holder client
    * @param {Object} options - application config
    */
-  constructor (options) {
+  constructor (options: IAccountHolderParams) {
     this.options = options
   }
 
@@ -23,7 +32,7 @@ class AccountHolder {
    * @param {string} parameters.accessToken - the oauth bearer token
    * @return {Promise} - the http request promise
    */
-  getAccountHolder (parameters) {
+  getAccountHolder (parameters: IAccountHolderParams): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     minAPIParameterValidator(parameters)
     const { apiUrl, accessToken } = parameters
@@ -44,7 +53,7 @@ class AccountHolder {
    * @param {string} parameters.accessToken - the oauth bearer token
    * @return {Promise} - the http request promise
    */
-  getAccountHolderName (parameters) {
+  getAccountHolderName (parameters: IAccountHolderParams): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     minAPIParameterValidator(parameters)
     const { apiUrl, accessToken } = parameters
@@ -65,7 +74,7 @@ class AccountHolder {
    * @param {string} parameters.accessToken - the oauth bearer token
    * @return {Promise} - the http request promise
    */
-  getAccountHolderIndividual (parameters) {
+  getAccountHolderIndividual (parameters: IAccountHolderParams): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     minAPIParameterValidator(parameters)
     const { apiUrl, accessToken } = parameters
@@ -86,7 +95,7 @@ class AccountHolder {
    * @param {string} parameters.accessToken - the oauth bearer token
    * @return {Promise} - the http request promise
    */
-  getAccountHolderJoint (parameters) {
+  getAccountHolderJoint (parameters: IAccountHolderParams): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     minAPIParameterValidator(parameters)
     const { apiUrl, accessToken } = parameters
@@ -107,7 +116,7 @@ class AccountHolder {
    * @param {string} parameters.accessToken - the oauth bearer token
    * @return {Promise} - the http request promise
    */
-  getAccountHolderBusiness (parameters) {
+  getAccountHolderBusiness (parameters: IAccountHolderParams): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     minAPIParameterValidator(parameters)
     const { apiUrl, accessToken } = parameters
@@ -128,7 +137,7 @@ class AccountHolder {
    * @param {string} parameters.accessToken - the oauth bearer token
    * @return {Promise} - the http request promise
    */
-  getAccountHolderBusinessRegisteredAddress (parameters) {
+  getAccountHolderBusinessRegisteredAddress (parameters: IAccountHolderParams): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     minAPIParameterValidator(parameters)
     const { apiUrl, accessToken } = parameters
@@ -149,7 +158,7 @@ class AccountHolder {
    * @param {string} parameters.accessToken - the oauth bearer token
    * @return {Promise} - the http request promise
    */
-  getAccountHolderBusinessCorrespondenceAddress (parameters) {
+  getAccountHolderBusinessCorrespondenceAddress (parameters: IAccountHolderParams): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     minAPIParameterValidator(parameters)
     const { apiUrl, accessToken } = parameters
@@ -164,5 +173,3 @@ class AccountHolder {
     })
   }
 }
-
-module.exports = AccountHolder

@@ -1,19 +1,28 @@
-import axios from 'axios'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import axios, { AxiosPromise } from 'axios'
 import debug from 'debug'
 import { defaultHeaders } from '../utils/http'
 import { minAPIParameterValidator } from '../utils/validator'
+
+export interface IAddressParams {
+  apiUrl: string;
+  accessToken: string;
+}
 
 const log = debug('starling:address-service')
 
 /**
  * Service to interact with a customer address
  */
-class Address {
+export class Address {
+  options: Partial<IAddressParams>
+
   /**
    * Creates an instance of the address client
    * @param {Object} options - configuration parameters
    */
-  constructor (options) {
+  constructor (options: IAddressParams) {
     this.options = options
   }
 
@@ -23,7 +32,7 @@ class Address {
    * @param {string} parameters.accessToken - the oauth bearer token.
    * @return {Promise} - the http request promise
    */
-  getAddresses (parameters) {
+  getAddresses (parameters: IAddressParams): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     minAPIParameterValidator(parameters)
     const { apiUrl, accessToken } = parameters
@@ -38,5 +47,3 @@ class Address {
     })
   }
 }
-
-module.exports = Address

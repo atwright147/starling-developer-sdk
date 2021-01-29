@@ -1,19 +1,38 @@
-import axios from 'axios'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import axios, { AxiosPromise } from 'axios'
 import debug from 'debug'
 import { defaultHeaders, payloadHeaders } from '../utils/http'
 import { struct, minAPIParameterDefintion } from '../utils/validator'
+
+export interface ISavingsGoalParams {
+  apiUrl: string;
+  accessToken: string;
+  accountUid: string;
+  savingsGoalUid: string;
+  transferUid: string;
+  amount: number;
+  currency: string;
+  name: string;
+  targetAmount: number;
+  targetCurrency: string;
+  base64EncodedPhoto: string;
+}
+
 
 const log = debug('starling:savings-goal-service')
 
 /**
  * Service to interact with a customer's savings goals
  */
-class SavingsGoal {
+export class SavingsGoal {
+  options: Partial<ISavingsGoalParams>
+
   /**
    * Create a new savings goal service
    * @param {Object} options - configuration parameters
    */
-  constructor (options) {
+  constructor (options: ISavingsGoalParams) {
     this.options = options
   }
 
@@ -24,7 +43,7 @@ class SavingsGoal {
    * @param {string} parameters.accountUid - the account uid
    * @return {Promise} - the http request promise
    */
-  getSavingsGoals (parameters) {
+  getSavingsGoals (parameters: Pick<ISavingsGoalParams, 'apiUrl' | 'accessToken' | 'accountUid'>): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     getSavingsGoalsParameterValidator(parameters)
     const { apiUrl, accessToken, accountUid } = parameters
@@ -47,7 +66,7 @@ class SavingsGoal {
    * @param {string} parameters.savingsGoalUid - the savings goal's uid
    * @return {Promise} - the http request promise
    */
-  getSavingsGoal (parameters) {
+  getSavingsGoal (parameters: Pick<ISavingsGoalParams, 'apiUrl' | 'accessToken' | 'accountUid' | 'savingsGoalUid'>): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     getSavingsGoalParameterValidator(parameters)
     const { apiUrl, accessToken, accountUid, savingsGoalUid } = parameters
@@ -74,7 +93,7 @@ class SavingsGoal {
    * @param {string=} parameters.base64EncodedPhoto - base64 encoded image to associate with the goal
    * @return {Promise} - the http request promise
    */
-  createSavingsGoal (parameters) {
+  createSavingsGoal (parameters: Pick<ISavingsGoalParams, 'apiUrl' | 'accessToken' | 'accountUid' | 'name' | 'currency' | 'targetAmount' | 'targetCurrency' | 'base64EncodedPhoto'>): AxiosPromise<any> {
     parameters = Object.assign({}, { currency: 'GBP', targetAmount: 0, targetCurrency: 'GBP' }, this.options, parameters)
     createSavingsGoalParameterValidator(parameters)
     const { apiUrl, accessToken, accountUid, name, currency, targetAmount, targetCurrency, base64EncodedPhoto } = parameters
@@ -106,7 +125,7 @@ class SavingsGoal {
    * @param {string} parameters.savingsGoalUid - the savings goal's uid
    * @return {Promise} - the http request promise
    */
-  deleteSavingsGoal (parameters) {
+  deleteSavingsGoal (parameters: Pick<ISavingsGoalParams, 'apiUrl' | 'accessToken' | 'accountUid' | 'savingsGoalUid'>): AxiosPromise<any>{
     parameters = Object.assign({}, this.options, parameters)
     deleteSavingsGoalParameterValidator(parameters)
     const { apiUrl, accessToken, accountUid, savingsGoalUid } = parameters
@@ -132,7 +151,7 @@ class SavingsGoal {
    * @param {string=} parameters.currency - ISO-4217 3 character currency code
    * @return {Promise} - the http request promise
    */
-  addMoneyToSavingsGoal (parameters) {
+  addMoneyToSavingsGoal (parameters: Pick<ISavingsGoalParams, 'apiUrl' | 'accessToken' | 'accountUid' | 'savingsGoalUid' | 'transferUid' | 'amount' | 'currency'>): AxiosPromise<any> {
     parameters = Object.assign({}, { currency: 'GBP' }, this.options, parameters)
     addMoneyToSavingsGoalParameterValidator(parameters)
     const { apiUrl, accessToken, accountUid, savingsGoalUid, transferUid, amount, currency } = parameters
@@ -164,7 +183,7 @@ class SavingsGoal {
    * @param {string=} parameters.currency - ISO-4217 3 character currency code
    * @return {Promise} - the http request promise
    */
-  withdrawMoneyFromSavingsGoal (parameters) {
+  withdrawMoneyFromSavingsGoal (parameters: Pick<ISavingsGoalParams, 'apiUrl' | 'accessToken' | 'accountUid' | 'savingsGoalUid' | 'transferUid' | 'amount' | 'currency'>): AxiosPromise<any> {
     parameters = Object.assign({}, { currency: 'GBP' }, this.options, parameters)
     withdrawMoneyFromSavingsGoalParameterValidator(parameters)
     const { apiUrl, accessToken, accountUid, savingsGoalUid, transferUid, amount, currency } = parameters
@@ -230,5 +249,3 @@ const withdrawMoneyFromSavingsGoalParameterValidator = struct.interface({
   amount: 'number',
   currency: 'string'
 })
-
-module.exports = SavingsGoal

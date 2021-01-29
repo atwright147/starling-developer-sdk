@@ -1,19 +1,34 @@
-import axios from 'axios'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import axios, { AxiosPromise } from 'axios'
 import debug from 'debug'
 import { defaultHeaders } from '../utils/http'
 import { struct, minAPIParameterDefintion } from '../utils/validator'
+
+export interface IFeedItemParams {
+  apiUrl: string;
+  accessToken: string;
+  accountUid: string;
+  categoryUid: string;
+  minTransactionTimestamp: string;
+  maxTransactionTimestamp: string;
+  feedItemUid: string;
+  changesSince: string;
+}
 
 const log = debug('starling:feed-item-service')
 
 /**
  * Service to interact with a customer's feed items
  */
-class FeedItem {
+export class FeedItem {
+  options: Partial<IFeedItemParams>
+
   /**
    * Create a new feed item service
    * @param {Object} options - configuration parameters
    */
-  constructor (options) {
+  constructor (options: IFeedItemParams) {
     this.options = options
   }
 
@@ -27,7 +42,7 @@ class FeedItem {
    * @param {string} parameters.maxTransactionTimestamp - timestamp e.g. '2019-10-26T12:34:56.789Z'
    * @return {Promise} - the http request promise
    */
-  getFeedItemsBetween (parameters) {
+  getFeedItemsBetween (parameters: Omit<IFeedItemParams, 'feedItemUid' | 'changesSince'>): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     getFeedItemsBetweenParameterValidator(parameters)
     const { apiUrl, accessToken, accountUid, categoryUid, minTransactionTimestamp, maxTransactionTimestamp } = parameters
@@ -55,7 +70,7 @@ class FeedItem {
    * @param {string} parameters.feedItemUid - the feed item uid
    * @return {Promise} - the http request promise
    */
-  getFeedItem (parameters) {
+  getFeedItem (parameters: Omit<IFeedItemParams, 'minTransactionTimestamp' | 'maxTransactionTimestamp' | 'changesSince'>): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     getFeedItemParameterValidator(parameters)
     const { apiUrl, accessToken, accountUid, categoryUid, feedItemUid } = parameters
@@ -79,7 +94,7 @@ class FeedItem {
    * @param {string} parameters.changesSince - timestamp e.g. '2019-10-25T12:34:56.789Z'
    * @return {Promise} - the http request promise
    */
-  getFeedItemsChangedSince (parameters) {
+  getFeedItemsChangedSince (parameters: Omit<IFeedItemParams, 'minTransactionTimestamp' | 'maxTransactionTimestamp' | 'feedItemUid'>): AxiosPromise<any> {
     parameters = Object.assign({}, this.options, parameters)
     getFeedItemsChangedSinceParameterValidator(parameters)
     const { apiUrl, accessToken, accountUid, categoryUid, changesSince } = parameters
