@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { Account } from './entities/account'
 import { AccountHolder } from './entities/accountHolder'
 import { Address } from './entities/address'
@@ -9,6 +11,12 @@ import { Payment } from './entities/payment'
 import { Mandate } from './entities/mandate'
 import { SavingsGoal } from './entities/savingsGoal'
 import { Identity } from './entities/identity'
+
+export interface IStarlingParams {
+  apiUrl: string;
+  clientId: string;
+  clientSecret: string;
+}
 
 /**
  * @property {Identity} identity
@@ -23,12 +31,25 @@ import { Identity } from './entities/identity'
  * @property {SavingsGoal} savingsGoal
  * @property {OAuth} oAuth
  */
-class Starling {
+export class Starling {
+  config: any
+  identity: Identity
+  accountHolder: AccountHolder
+  account: Account
+  address: Address
+  feedItem: FeedItem
+  payment: Payment
+  mandate: Mandate
+  payee: Payee
+  card: Card
+  savingsGoal: SavingsGoal
+  oAuth: OAuth
+
   /**
    * Create an instance of the starling client
    * @param {Object=} options - configuration parameters
    */
-  constructor (options) {
+  constructor (options: IStarlingParams) {
     const defaults = {
       apiUrl: 'https://api.starlingbank.com',
       clientId: '',
@@ -50,5 +71,3 @@ class Starling {
     this.oAuth = new OAuth(this.config)
   }
 }
-
-module.exports = Starling

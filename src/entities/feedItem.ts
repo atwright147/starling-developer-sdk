@@ -134,5 +134,3 @@ const getFeedItemsChangedSinceParameterValidator = struct.interface({
   categoryUid: 'uuid',
   changesSince: 'timestamp'
 })
-
-module.exports = FeedItem
